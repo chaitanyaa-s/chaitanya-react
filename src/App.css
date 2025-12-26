@@ -49,5 +49,11 @@ body {
 .description {
   font-size: 1.5rem;
   text-transform: capitalize;
+  margin-bottom: 1rem;
+
+}
+
+.air-quality {
+  font-size: 1.2rem;
 }
 
