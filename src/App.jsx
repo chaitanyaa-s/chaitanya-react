@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+
+import { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchWeather = async () => {
+      try {
+        const response = await fetch('/api/current?access_key=82804af8fc510d67f3d81c6556b63ebf&query=New%20Delhi');
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error.info);
+        }
+
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+
+        setWeather(data);
+      } catch (error) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWeather();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="App">
+      <div className="weather-card">
+        <h1>Weather in New Delhi</h1>
+        {loading && <p>Loading...</p>}
+        {error && <p>Error: {error.message}</p>}
+        {weather && weather.current && (
+          <div className="weather-info">
+            <img src={weather.current.weather_icons[0]} alt="Weather icon" />
+            <p className="temperature">{weather.current.temperature}°C</p>
+            <p className="description">{weather.current.weather_descriptions[0]}</p>
+          </div>
+        )}
       </div>
-      <h1> + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    </div>
+  );
 }
 
-export default App
+export default App;
